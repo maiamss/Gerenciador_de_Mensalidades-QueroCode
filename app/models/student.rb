@@ -12,7 +12,7 @@ class Student < ApplicationRecord
     #Remove caracteres não numéricos do CPF
         cpf.gsub!(/[^\d]/, '')
 
-        if cpf.length == 11
+        if cpf.length == 11 
 
             # Cálculo do primeiro dígito verificador (j)
             sum_j = 0
@@ -50,7 +50,8 @@ class Student < ApplicationRecord
             # Verifica se os dígitos verificadores calculados são iguais aos dígitos do CPF
             if j != cpf[9] && k != cpf[10]
                 errors.add(:cpf, '-> Invalid CPF')
-            
+            elsif cpf.chars.uniq.length == 1
+                errors.add(:cpf, '-> CPF cannot have all digits equal')
             end
 
         else 
