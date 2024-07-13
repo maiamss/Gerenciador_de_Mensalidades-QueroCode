@@ -1,23 +1,25 @@
 class Student < ApplicationRecord
     validates :name, presence: true
     validates :cpf, presence: true, uniqueness: true
-    validates :birthdate, date: true, allow_blank: true
-    validates :payment_method, presence: true, inclusion: { in: %w(credit_card boleto), message: "Invalid payment method." }
+    validates :birthdate, presence: true 
+    validates :payment_method, presence: true, inclusion: { in: %w(credit_card boleto), message: "-> Invalid payment method." }
     
     validate :check_cpf
 
     private 
     
     def check_cpf
-        # Remove caracteres não numéricos do CPF
+    #Remove caracteres não numéricos do CPF
         cpf.gsub!(/[^\d]/, '')
 
         if cpf.length == 11
 
             # Cálculo do primeiro dígito verificador (j)
             sum_j = 0
-            1.upto(9) do |i|
-                sum_j += cpf[i-1].to_i * i
+            cont = 10
+            0.upto(8) do |i|
+                sum_j += cpf[i].to_i * cont
+                cont -= 1
             end
 
             rest = sum_j % 11
@@ -30,9 +32,10 @@ class Student < ApplicationRecord
             
             # Cálculo do segundo dígito verificador (k)
             sum_k = 0
-
+            contk = 11
             0.upto(9) do |i|
-                sum_k += cpf[i].to_i * i
+                sum_k += cpf[i].to_i * contk
+                contk -=1
             end
 
             rest = sum_k % 11
@@ -46,11 +49,12 @@ class Student < ApplicationRecord
             
             # Verifica se os dígitos verificadores calculados são iguais aos dígitos do CPF
             if j != cpf[9] && k != cpf[10]
-                errors.add(:cpf, 'Invalid CPF')
-
+                errors.add(:cpf, '-> Invalid CPF')
+            
+            end
 
         else 
-            errors.add(:cpf, 'Invalid CPF')
+            errors.add(:cpf, '-> CPF must contain 11 digits')
         end    
 
     end
