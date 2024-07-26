@@ -1,13 +1,30 @@
 module V1
   class StudentsController < ApplicationController
 
-    # GET /students
+    
+  # GET /students    
     def index
-      @students = Student.all
-      render json: @students
-    end
+      page = (params[:page] || 1).to_i
+      per_page = (params[:count] || 10).to_i
+      offset = (page - 1) * per_page
+    
+      students = Student.limit(per_page).offset(offset)
 
-    # POST /students
+      render json: {
+        page: page,
+        items: students.map do |student|
+          {
+            id: student.id,
+            name: student.name,
+            cpf: student.cpf,
+            birthdate: student.birthdate.strftime("%d/%m/%Y"),
+            payment_method: student.payment_method
+          }
+        end
+      }
+    end 
+    
+      # POST /students
     def create
       @student = Student.new(student_params)
       if @student.save
