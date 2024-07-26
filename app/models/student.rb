@@ -6,10 +6,19 @@ class Student < ApplicationRecord
     validates :birthdate, presence: true 
     validates :payment_method, presence: true, inclusion: { in: %w(credit_card boleto), message: "-> Invalid payment method." }
     
+    validate :check_birthdate
     validate :check_cpf
+    
 
     private 
-    
+    def check_birthdate
+        if birthdate > Date.today
+            errors.add(:birthdate, "-> Invalid date")
+        elsif birthdate > 18.years.ago.to_date
+            errors.add(:birthdate, "-> You must be at least 18 years old")
+        end
+    end
+
     def check_cpf
     #Remove caracteres não numéricos do CPF
         cpf.gsub!(/[^\d]/, '')
